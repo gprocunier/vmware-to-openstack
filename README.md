@@ -10,10 +10,11 @@ Modify the example migrate_vm.yml to suit your needs.
 
 
 ## Requirements
+```
 ansible collections:
-  community.vmware
+  community.vmware  
   community.general
-
+```
 VMWare VDDK:
   https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
 
