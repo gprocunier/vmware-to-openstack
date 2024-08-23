@@ -9,3 +9,14 @@ Modify the secrets.yml to provide vital data for interacting with vcenter and op
 Modify the example migrate_vm.yml to suit your needs.
 
 
+## Requirements
+ansible collections:
+  community.vmware
+  community.general
+
+VMWare VDDK:
+  https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
+
+You need an openstack clouds.yaml installed in the user on the conversion appliance vm in openstack that the ansible playbook will operate as.
+
+The ansible user on the conversion appliance needs passwordless sudo to run virt-v2v.
