@@ -15,6 +15,9 @@ ansible collections:
   community.vmware  
   community.general
 ```
+
+The virt-v2v/nbdkit tools.
+
 VMWare VDDK:
   https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
 
