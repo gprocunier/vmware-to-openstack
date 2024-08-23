@@ -1,0 +1,24 @@
+---
+# tasks file for storageMigration
+
+- name: virt-v2v weightless migrate from vmware to openstack cinder
+  become: true
+  tags: storage
+  vars:
+    vcenter_user_formatted: "{{ vcenter_username | regex_replace('@','%40') }}"
+  environment:
+    OS_CLOUD: "{{ openstack_cloud }}"
+  shell: |
+    virt-v2v \
+       -ic 'vpx://{{ vcenter_user_formatted }}@{{ vcenter_hostname }}/{{ vcenter_dc }}/host/{{ guestInfo[0].vcenter_cluster }}/{{ guestInfo[0].vcenter_compute_host }}?no_verify=1' \
+       -it vddk \
+       -io vddk-libdir={{ vddk_libdir }} \
+       -io vddk-thumbprint={{ vddk_thumbprint }} \
+       -ip {{ vcenter_authfile }} \
+       -o openstack \
+       -oo os-username={{ openstack_user }} \
+       -oo server-id={{ migration_host_id }}\
+       -os {{ cinder_volume_type }}  \
+       -oo guest-id={{ vm_name }} \
+       {{ vm_name }}
+

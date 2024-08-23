@@ -1,0 +1,42 @@
+---
+# tasks file for vm_migration
+
+### Initialization
+- pause:
+    prompt: "What is the case-sensitive name of the VM to be migrated?"
+  register: prompt
+  when: vm_name is not defined
+  tags: always
+
+- set_fact:
+    vm_name: "{{ prompt.user_input }}"
+  when: prompt.user_input is defined
+  tags: always
+
+### Guest analysis
+- include_tasks: guestAnalysis.yml
+  tags: guest
+
+### Network preparation
+- include_tasks: networkAnalysis.yml
+  tags: network
+
+## Storage preparation
+- include_tasks: storageMigration.yml
+  tags: storage
+
+
+## Network Assembly
+
+- include_tasks: networkAssembly.yml
+  tags: assemble_network
+
+## Storage Assembly
+- include_tasks: storageAssembly.yml
+  tags: assemble_storage
+
+## Guest Assembly
+- include_tasks: guestAssembly.yml
+  tags: assemble_guest
+
+

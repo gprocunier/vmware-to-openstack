@@ -1,0 +1,32 @@
+---
+# tasks file for guestAssembly
+
+- name: prepare the image metadata command
+  set_fact:
+    image_properties: "{{ image_metadata | map('regex_replace', '^(.*)$', '--image-property \\1') | join(' ') }}"
+  when: image_metadata is defined
+  tags: assemble_guest
+
+- name: set guest boot volume image metadata
+  shell: |
+    openstack volume set {{ volumes[0] }} {{ image_properties }}
+  when: hw_machine_type is defined
+  environment:
+    OS_CLOUD: "{{ openstack_cloud }}"
+  tags: assemble_guest
+
+- name: assemble and boot the instance
+  openstack.cloud.server:
+    cloud: "{{ openstack_cloud }}"
+    state: present
+    name: "{{ vm_name }}"
+    nics: "{{ nics }}"
+    boot_volume: "{{ volumes[0] }}"
+    # exclude the first disk as it is allocated via boot_volume
+    volumes: "{{ volumes[1:] }}"
+    # Deprecated, only used for automatically created ports
+    # security_groups: "{{ vm_security_groups }}"
+    security_groups: []
+    flavor: "{{ selected_flavor }}"
+  tags: assemble_guest
+

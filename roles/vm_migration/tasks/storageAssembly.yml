@@ -1,0 +1,26 @@
+---
+# tasks file for storageAssembly
+
+- name: get openstack volume data
+  openstack.cloud.volume_info:
+    cloud: "{{ openstack_cloud }}"
+    details: false
+  register: openstack_volumes
+  tags: assemble_storage
+
+- name: extract volumes
+  set_fact:
+    volumes: "{{ volumes | default([]) + [ disk_name ] }}"
+  loop: "{{ openstack_volumes.volumes }}"
+  when: item.name is match(regex)
+  vars:
+    regex: "^{{ vm_name }}-sd"
+    disk_name: "{{ item.name }}"
+  no_log: true
+  tags: assemble_storage
+
+- name: sort volumes into a list for attachment
+  set_fact:
+    volumes: "{{ volumes | sort }}"
+  tags: assemble_storage
+

@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars_files:
+    - secrets.yaml
+    - network_map.yml
+  roles:
+    - role: vm_migration
+      vars:
+        vm_name: "myVmwareGuest"
+        openstack_cloud: "standalone"
+        openstack_user: "admin"
+        migration_host_id: "migration-factory"
+        cinder_volume_type: "rhcs6-gp3"
+        vm_security_groups:
+          - security-group-id-for-the-guest-ports
+        image_metadata:
+          - hw_rng_model='virtio'
+          - os_type='linux'
+          - hw_vif_model='virtio'
+          - hw_scsi_model='virtio-scsi'
+          - hw_qemu_guest_agent='True'
+          - hw_disk_bus='scsi'
+          - os_distro='rhel'
+          - hw_machine_type='q35'
+          - hw_firmware_type='uefi'
+          - hw_boot_mode='uefi'
+          - cinder_img_volume_type='rhcs6-gp3'
+

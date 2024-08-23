@@ -1,0 +1,27 @@
+---
+# defaults file for vm_migration
+debug_path: /tmp
+# required for virt-v2v
+vddk_libdir: "/home/cloud-user/vmware-vix-disklib-distrib/"
+vddk_thumbprint: "my:vd:dk:th:um:bp:ri:nt"
+# used by virt-v2v
+vcenter_authfile: "/home/cloud-user/vmware-password-in-here"
+openstack_user: "admin"
+migration_host_id: "name-or-id-of-openstack-instance-for-conversion"
+cinder_volume_type: "cinder-volume-type"
+vm_security_groups:
+  - security-groups-for-ports
+image_metadata:
+  - hw_rng_model='virtio'
+  - hw_vif_model='virtio'
+  - hw_scsi_model='virtio-scsi'
+  - hw_qemu_guest_agent='True'
+  - hw_disk_bus='scsi'
+  - hw_machine_type='q35'
+  - hw_firmware_type='uefi'
+  - hw_boot_mode='uefi'
+  - hw_watchdog_action='reset
+# - hw:tpm_model='tpm-tis'
+# - hw:tpm_version='2.0'
+# - os_require_quiesce='True'
+# - os_secure_boot='required' 

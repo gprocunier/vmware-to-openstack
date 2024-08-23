@@ -1,0 +1,36 @@
+---
+# tasks file for networkAssembly
+
+- name: create guest nic with expected MAC Address 
+  openstack.cloud.port:
+    cloud: "{{ openstack_cloud }}"
+    state: present
+    name: "{{ vm_name }}-NIC-{{ nic_index }}-VLAN-{{ item.vlan }}"
+    network: "{{ item.vlan | string }}"
+    mac_address: "{{ item.mac }}"
+    allowed_address_pairs:
+      - ip_address: 0.0.0.0/0
+        mac_address: "{{ item.mac }}"
+    security_groups: "{{ vm_security_groups }}"
+  loop: "{{ guestNic }}"
+  loop_control:
+    index_var: nic_index
+  tags: assemble_network
+
+- name: get available ports
+  openstack.cloud.port_info:
+    cloud: "{{ openstack_cloud }}"
+  register: port_info
+  no_log: true
+  tags: assemble_network
+
+- name: extract ports
+  set_fact: 
+    nics: "{{ nics | default([]) + [{ 'port-name': item.name } ] }}"
+  loop: "{{ port_info.ports }}"
+  when: item.name is match(regex)
+  vars:
+    regex: "^{{ vm_name }}-NIC-"
+  no_log: true
+  tags: assemble_network
+

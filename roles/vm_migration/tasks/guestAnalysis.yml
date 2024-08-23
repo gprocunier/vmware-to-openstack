@@ -1,0 +1,111 @@
+---
+# tasks file guestAnalysis
+
+- community.vmware.vmware_guest_info:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: '{{ vcenter_dc }}'
+    validate_certs: false
+    name: '{{ vm_name }}'
+  register: vm_info
+  tags: guest
+
+- name: Dump vm_info to a trace file
+  copy:
+    content: "{{ vm_info | to_nice_json }}"
+    dest: "{{ debug_path }}/vm_info_{{ansible_date_time.iso8601 | regex_replace(':','-') }}.json"
+  tags: [ never, debug ]
+
+- name: extract vm info
+  set_fact:
+    guestInfo: >-
+      {{
+        guestInfo 
+        | default([]) + [ 
+          {
+            'name': vm_name, 
+            'vcpu': vm_cpu | int, 
+            'ram': vm_ram | int, 
+            'vcenter_cluster': vcenter_cluster, 
+            'vcenter_compute_host': vcenter_compute_host 
+          }
+        ] 
+      }}
+  vars:
+    vm_name: "{{ vm_info.instance.hw_name }}"
+    vm_cpu: "{{ vm_info.instance.hw_processor_count }}"
+    vm_ram: "{{ vm_info.instance.hw_memtotal_mb }}"
+    vcenter_compute_host: "{{ vm_info.instance.hw_esxi_host }}"
+    vcenter_cluster: "{{ vm_info.instance.hw_cluster }}"
+  tags: guest
+
+- name: get OS flavors that are a LCD of >={{ guestInfo[0].ram }} and >={{ guestInfo[0].vcpu }}
+  openstack.cloud.compute_flavor_info:
+    cloud: "{{ openstack_cloud }}" 
+    ram: ">={{ guestInfo[0].ram }}"
+    vcpus: ">={{ guestInfo[0].vcpu }}"
+  register: cloud_flavors
+  tags: guest
+
+- name: parse flavors
+  set_fact:
+    myFlavors: >-
+      {{
+        myFlavors 
+        | default({}) 
+        | combine({ 
+            item.name: { 
+              'vcpu': item.vcpus | int, 
+              'ram': item.ram | int,
+              'shares': shares | int 
+            } 
+        }) 
+      }}
+  loop: "{{ cloud_flavors.flavors }}"
+  vars:
+    shares: "{{ item.extra_specs['quota:cpu_shares'] }}"
+  when: item.extra_specs['quota:cpu_shares'] is defined
+  tags: guest
+
+- name: Calculate custom scores for each flavor
+  set_fact:
+    flavor_scores: >-
+      {{
+        flavor_scores
+        | default({})
+        | combine({
+            item.key: (item.value.shares * item.value.ram * item.value.vcpu)
+          }) 
+      }}
+  loop: "{{ myFlavors | dict2items }}"
+  vars:
+    score: "{{ item.value.shares * item.value.ram * item.value.vcpu }}"
+  tags: guest
+
+- name: Sort flavors based on the score (least expensive)
+  set_fact:
+    sorted_flavors: >-
+      {{
+        flavor_scores 
+        | dict2items 
+        | sort(attribute='value') 
+        | items2dict(key_name='key', value_name='value')
+      }}
+  tags: guest
+
+- name: Find the best matching flavor
+  set_fact:
+    selected_flavor: "{{ item.key }}"
+  when: item.value.ram >= guestInfo[0].ram and item.value.vcpu >= guestInfo[0].vcpu
+  loop: "{{ sorted_flavors | dict2items }}"
+  vars:
+    flavor_selected: "{{ selected_flavor is defined }}"
+  when: not flavor_selected  # Stop iterating once a flavor is selected
+  tags: guest
+
+- name: Display selected flavor
+  debug:
+    msg: "Selected flavor for the VM with {{ guestInfo[0].vcpu }} vCPU and {{ guestInfo[0].ram }} MB RAM is: {{ selected_flavor }}"
+  tags: guest 
+

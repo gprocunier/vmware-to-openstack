@@ -1,0 +1,10 @@
+---
+# vars file for vm_migration
+
+# vcenter_hostname: "your_vcenter_host"
+# vcenter_username: "your_vcenter_user"
+# vcenter_password: "your_vcenter_password"
+# vcenter_dc: "your_datacenter"
+# openstack_cloud: "your_openstack_cloud"
+# openstack_project: "your_project"
+ 
