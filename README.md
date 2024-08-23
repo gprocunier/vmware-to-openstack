@@ -18,6 +18,6 @@ ansible collections:
 VMWare VDDK:
   https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
 
-You need an openstack clouds.yaml installed in the user on the conversion appliance vm in openstack that the ansible playbook will operate as.
+You need an openstack `clouds.yaml` installed in the user on the conversion appliance vm in openstack that the ansible playbook will operate as.
 
 The ansible user on the conversion appliance needs passwordless sudo to run virt-v2v.
