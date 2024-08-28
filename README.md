@@ -13,7 +13,7 @@ Modify the example `migrate_vm.yml` to suit your needs.
 
 
 ## Requirements
-An openstack VM (migration-factory) with access to the cinder/neutron/nova APIs
+An openstack VM (migration-factory) with access to the vcenter/esxi hosts as well as cinder/neutron/nova APIs
 
 The following collections installed on the migration-factory
 
