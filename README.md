@@ -1,6 +1,9 @@
 # vmware-to-openstack
 An ansible role that migrates VMWare Guests into OpenStack
 
+## High Level Overview of the Role
+![](https://github.com/gprocunier/vmware-to-openstack/blob/main/images/vmw2osp-hla.png?raw=true)
+
 ## Usage
 Modify the `network_map.yml` to link vmware network names to neutron network names
 
