@@ -13,17 +13,21 @@ Modify the example `migrate_vm.yml` to suit your needs.
 
 
 ## Requirements
+An openstack VM (migration-factory) with access to the cinder/neutron/nova APIs
+
+The following collections installed on the migration-factory
+
 ```
 ansible collections:
   community.vmware  
   community.general
 ```
 
-The virt-v2v/nbdkit tools.
+The virt-v2v/nbdkit tools on the migration-factory
 
-VMWare VDDK:
+VMWare VDDK installed on the migration factory:
   https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest
 
-You need an openstack `clouds.yaml` installed in the user on the conversion appliance vm in openstack that the ansible playbook will operate as.
+You need an openstack `clouds.yaml` installed in the user on the migration-factory vm in openstack that the ansible playbook will operate as.
 
-The ansible user on the conversion appliance needs passwordless sudo to run virt-v2v.
+The ansible user on the migration-factory needs passwordless sudo to run virt-v2v.
