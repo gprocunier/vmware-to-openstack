@@ -3,7 +3,7 @@
   connection: local
   gather_facts: yes
   vars_files:
-    - secrets.yaml
+    - secrets.yml
     - network_map.yml
   roles:
     - role: vm_migration
